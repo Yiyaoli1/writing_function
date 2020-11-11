@@ -464,12 +464,18 @@ l</code></pre>
 ##   mean_x  sd_x
 ##    &lt;dbl&gt; &lt;dbl&gt;
 ## 1  -2.81  1.14</code></pre>
-<p>let’s use for loop first make empty list</p>
+<p>let’s use for loop first row : make empty list</p>
 <pre class="r"><code>output = vector(&quot;list&quot;, length = 4)
 
 for (i in 1:4){
   output[[1]] = mean_and_sd(list_norm[[i]])
 }</code></pre>
+</div>
+<div id="lets-try-map" class="section level2">
+<h2>let’s try map</h2>
+<pre class="r"><code>output = map(list_norm, mean_and_sd)</code></pre>
+<p>what if we want a different function?</p>
+<pre class="r"><code>output = map(list_norm, IQR)</code></pre>
 </div>
 
 
