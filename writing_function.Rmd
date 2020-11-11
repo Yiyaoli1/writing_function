@@ -49,3 +49,180 @@ z_score(c(TRUE, TRUE, FALSE, FALSE))
 z_score(c(1,2))
 ```
 
+## Multiple outputs
+
+```{r}
+mean_and_sd = function(x){
+  
+  if(!is.numeric(x)){
+    stop("Input must be numeric")
+  }
+  
+  if(length(x)<3){
+    stop("Input must have at least 3 numbers")
+  }
+ 
+   mean_x = mean(x)
+   sd_x = sd(x)
+   
+   tibble(
+     mean_x, sd_x
+   )
+  
+}
+
+```
+
+check that function
+
+```{r}
+mean_and_sd(x_vec)
+mean_and_sd(c(1,2,4,7))
+x_vec = rnorm(100, mean=3, sd = 4)
+mean_and_sd(x_vec)
+```
+
+## multiple input
+
+I'd like to make this as a function
+
+```{r}
+sim_data = 
+  tibble(
+    x = rnorm(100, mean = 7, sd = 3)
+  )
+sim_data %>%
+  summarize(
+    mean = mean(x),
+    sd = sd(x)
+  )
+  
+```
+
+
+```{r}
+sim_mean_sd = function(n, mu = 2, sigma = 3) {
+  
+  sim_data = tibble(
+    x = rnorm(n, mean = mu, sd = sigma),
+  )
+  
+  sim_data %>% 
+    summarize(
+      mu_hat = mean(x),
+      sigma_hat = sd(x)
+    )
+}
+
+sim_mean_sd(100,2,4)
+```
+
+review function
+
+```{r}
+url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber=1"
+
+dynamite_html = read_html(url)
+
+review_titles = 
+  dynamite_html %>%
+  html_nodes(".a-text-bold span") %>%
+  html_text()
+
+review_stars = 
+  dynamite_html %>%
+  html_nodes("#cm_cr-review_list .review-rating") %>%
+  html_text() %>%
+  str_extract("^\\d") %>%
+  as.numeric()
+
+review_text = 
+  dynamite_html %>%
+  html_nodes(".review-text-content span") %>%
+  html_text() %>% 
+  str_replace_all("\n", "") %>% 
+  str_trim()
+
+reviews = tibble(
+  title = review_titles,
+  stars = review_stars,
+  text = review_text
+)
+```
+
+```{r}
+read_page_reviews <- function(url) {
+  
+  html = read_html(url)
+  
+  review_titles = 
+    html %>%
+    html_nodes(".a-text-bold span") %>%
+    html_text()
+  
+  review_stars = 
+    html %>%
+    html_nodes("#cm_cr-review_list .review-rating") %>%
+    html_text() %>%
+    str_extract("^\\d") %>%
+    as.numeric()
+  
+  review_text = 
+    html %>%
+    html_nodes(".review-text-content span") %>%
+    html_text() %>% 
+    str_replace_all("\n", "") %>% 
+    str_trim()
+  
+  tibble(
+    title = review_titles,
+    stars = review_stars,
+    text = review_text
+  )
+}
+```
+
+check the function
+
+```{r}
+url_base = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber="
+vec_urls = str_c(url_base, 1:5)
+
+dynamite_reviews = bind_rows(
+  read_page_reviews(vec_urls[1]),
+  read_page_reviews(vec_urls[2]),
+  read_page_reviews(vec_urls[3]),
+  read_page_reviews(vec_urls[4]),
+  read_page_reviews(vec_urls[5])
+)
+
+dynamite_reviews
+```
+
+## mean scoping example
+
+```{r}
+f = function(x){
+  z = x+y
+  z
+}
+x = 1
+y = 2
+f(x = y)
+```
+
+## functions as arguments
+
+```{r}
+my_summary = function(x,summ_func){
+  
+  summ_func(x)
+  
+}
+
+x_vec = rnorm(100,3,7)
+
+
+my_summary(x_vec, IQR)
+```
+
